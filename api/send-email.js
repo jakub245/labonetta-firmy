@@ -53,11 +53,18 @@ export default async function handler(req, res) {
         <div style="background: #E1F5EE; border-radius: 10px; padding: 20px 24px; margin: 24px 0;">
           <p style="margin: 0 0 12px; font-weight: 600; color: #0F6E56;">Shrnutí Vaší poptávky</p>
           <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <tr><td style="padding: 5px 0; color: #6b6960; width: 40%;">Firma</td><td style="padding: 5px 0; font-weight: 500;">${firma}</td></tr>
+            <tr><td style="padding: 5px 0; color: #6b6960; width: 40%;">Jméno</td><td style="padding: 5px 0; font-weight: 500;">${jmeno} ${prijmeni}</td></tr>
+            <tr><td style="padding: 5px 0; color: #6b6960;">Telefon</td><td style="padding: 5px 0;">${telefon}</td></tr>
+            <tr><td style="padding: 5px 0; color: #6b6960;">Email</td><td style="padding: 5px 0;">${email}</td></tr>
+            <tr><td style="padding: 5px 0; color: #6b6960;">Firma</td><td style="padding: 5px 0; font-weight: 500;">${firma}</td></tr>
             <tr><td style="padding: 5px 0; color: #6b6960;">Adresa</td><td style="padding: 5px 0;">${adresa || '—'}</td></tr>
+            ${budova && budova !== '—' ? `<tr><td style="padding: 5px 0; color: #6b6960;">Budova</td><td style="padding: 5px 0;">${budova}</td></tr>` : ''}
+            ${patro && patro !== '—' ? `<tr><td style="padding: 5px 0; color: #6b6960;">Patro / místnost</td><td style="padding: 5px 0;">${patro}</td></tr>` : ''}
             <tr><td style="padding: 5px 0; color: #6b6960;">Datum a čas</td><td style="padding: 5px 0; font-weight: 500;">${datum} v ${cas}</td></tr>
             <tr><td style="padding: 5px 0; color: #6b6960;">Počet osob / pizz</td><td style="padding: 5px 0;">${osoby} / ${pizzy}</td></tr>
             <tr><td style="padding: 5px 0; color: #6b6960;">Způsob dodání</td><td style="padding: 5px 0;">${dodani}</td></tr>
+            ${poznamka && poznamka !== '—' ? `<tr><td style="padding: 5px 0; color: #6b6960;">Poznámka</td><td style="padding: 5px 0;">${poznamka}</td></tr>` : ''}
+            ${opakovani === 'Ano, má zájem' ? `<tr><td style="padding: 5px 0; color: #6b6960;">Pravidelné dodávky</td><td style="padding: 5px 0; color: #0F6E56; font-weight: 500;">Zájem o pravidelné dodávky</td></tr>` : ''}
           </table>
         </div>
 
