@@ -786,6 +786,23 @@
   }
   .modal-btn:hover { background: var(--teal-dark); }
 
+  /* Date warning */
+  .date-warning {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #fef3cd;
+    border: 1.5px solid #f0c040;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #7a5500;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .date-warning.visible { display: flex; }
+  .date-warning svg { flex-shrink: 0; }
+
   @media (max-width: 480px) {
     body { padding: 0; align-items: flex-start; }
     .card { border-radius: 0; min-height: 100vh; box-shadow: none; }
@@ -1001,6 +1018,14 @@
       <div class="field">
         <label for="datum">Datum</label>
         <input type="date" id="datum" required>
+        <div class="date-warning" id="dateWarning">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#f0c040" stroke-width="1.5"/>
+            <path d="M8 5v4" stroke="#7a5500" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r="0.75" fill="#7a5500"/>
+          </svg>
+          Poptávku přijímáme nejméně 48 hodin předem — datum jsme upravili na nejbližší možný termín.
+        </div>
       </div>
       <div class="field">
         <label for="cas">Čas doručení</label>
@@ -1293,10 +1318,29 @@
     });
   }
 
-  // Set min date to today
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('datum').setAttribute('min', today);
-  document.getElementById('datum').value = today;
+  // Min datum = dnes + 48 hodin
+  const minDate = new Date();
+  minDate.setHours(minDate.getHours() + 48);
+  const minDateStr = minDate.toISOString().split('T')[0];
+  document.getElementById('datum').setAttribute('min', minDateStr);
+  document.getElementById('datum').value = minDateStr;
+
+  // Validace při změně datumu
+  document.getElementById('datum').addEventListener('change', (e) => {
+    const selected = new Date(e.target.value);
+    const min = new Date(minDateStr);
+    if (selected < min) {
+      e.target.value = minDateStr;
+      showDateWarning();
+    }
+  });
+
+  function showDateWarning() {
+    document.getElementById('dateWarning').classList.add('visible');
+    setTimeout(() => {
+      document.getElementById('dateWarning').classList.remove('visible');
+    }, 4000);
+  }
 
   // Validace telefonu — 9 číslic
   function validatePhone() {
