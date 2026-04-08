@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poptávka – Labonetta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #1D9E75;
+    --teal-dark: #0F6E56;
+    --teal-light: #E1F5EE;
+    --teal-mid: #9FE1CB;
+    --bg: #f5f4f0;
+    --card: #ffffff;
+    --border: #e0ddd6;
+    --border-focus: #1D9E75;
+    --text: #1a1a18;
+    --text-muted: #6b6960;
+    --text-hint: #9e9c95;
+    --warn-bg: #faf9e8;
+    --warn-border: #e8e2b0;
+    --input-h: 52px;
+    --radius: 10px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 1rem;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+  }
+  .site-header { max-width: 520px; width: 100%; }
+
+  /* Stepper header */
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .step.active { color: var(--teal); }
+  .step.inactive { color: var(--text-hint); }
+  .step-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .step-arrow {
+    margin: 0 14px;
+    color: var(--text-hint);
+    font-size: 13px;
+  }
+
+  /* Form body */
+  .form-body {
+    padding: 28px 28px 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .row.single { grid-template-columns: 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+  }
+  label .optional {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-hint);
+    margin-left: 4px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    height: var(--input-h);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--card);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+  }
+
+  /* Custom select arrow */
+  .select-wrap {
+    position: relative;
+  }
+  .select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--text-muted);
+    pointer-events: none;
+  }
+  .select-wrap select { padding-right: 38px; cursor: pointer; }
+
+  /* Counter widget */
+  .counter-wrap {
+    display: flex;
+    align-items: center;
+    height: var(--input-h);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+  }
+  .counter-btn {
+    width: 52px;
+    height: 100%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, color 0.12s;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .counter-btn:hover { background: var(--teal-light); color: var(--teal-dark); }
+  .counter-btn:active { background: var(--teal-mid); }
+  .counter-divider {
+    width: 1px;
+    height: 60%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .counter-value {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    border: none !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+    padding: 0 4px !important;
+    box-shadow: none !important;
+    background: transparent;
+    -moz-appearance: textfield;
+    width: 100%;
+  }
+  .counter-value::-webkit-outer-spin-button,
+  .counter-value::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  /* Dodávka radio group */
+  .delivery-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .delivery-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .delivery-option:hover { border-color: var(--teal-mid); background: var(--teal-light); }
+  .delivery-option input[type="radio"] { display: none; }
+  .delivery-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+  }
+  .delivery-radio::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .delivery-option.selected {
+    border-color: var(--teal);
+    background: var(--teal-light);
+  }
+  .delivery-option.selected .delivery-radio {
+    border-color: var(--teal);
+  }
+  .delivery-option.selected .delivery-radio::after { opacity: 1; }
+
+  /* Poznámka / textarea */
+  textarea {
+    height: auto;
+    min-height: 90px;
+    padding: 14px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  /* Info box */
+  .info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--teal-light);
+    border: 1.5px solid var(--teal-mid);
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    margin-bottom: 14px;
+  }
+  .info-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .info-box p {
+    font-size: 13.5px;
+    color: var(--teal-dark);
+    line-height: 1.5;
+  }
+
+  /* Opakovaná objednávka checkbox */
+  .repeat-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 14px;
+  }
+  .repeat-wrap:hover { border-color: var(--teal-mid); background: var(--teal-light); }
+  .repeat-wrap.checked { border-color: var(--teal); background: var(--teal-light); }
+  .repeat-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--card);
+  }
+  .repeat-wrap.checked .repeat-checkbox {
+    border-color: var(--teal);
+    background: var(--teal);
+  }
+  .repeat-wrap.checked .repeat-checkbox::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .repeat-text { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
+  .repeat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* GDPR */
+  .gdpr-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 0 18px;
+    cursor: pointer;
+  }
+  .gdpr-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--card);
+  }
+  .gdpr-checkbox.checked {
+    border-color: var(--teal);
+    background: var(--teal);
+  }
+  .gdpr-checkbox.checked::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .gdpr-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .gdpr-text a {
+    color: var(--teal);
+    text-decoration: underline;
+  }
+
+  /* Footer / button area */
+  .form-footer {
+    padding: 0 28px 28px;
+  }
+
+  .btn-submit {
+    width: 100%;
+    height: 56px;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .btn-submit:hover { background: var(--teal-dark); }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled {
+    background: #a8d5c2;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .confirm-msg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .confirm-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    flex-shrink: 0;
+  }
+
+  .powered {
+    text-align: center;
+    padding: 14px 24px 20px;
+    font-size: 12px;
+    color: var(--text-hint);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Success / Potvrzení screen */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .success-screen {
+    display: none;
+    flex-direction: column;
+  }
+  .success-screen.visible { display: flex; }
+  .success-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 28px 24px;
+    text-align: center;
+    gap: 12px;
+    animation: fadeUp 0.4s ease forwards;
+  }
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--teal-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  .success-hero h2 { font-size: 21px; font-weight: 600; color: var(--text); }
+  .success-hero p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  .summary-block {
+    margin: 0 28px 28px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.4s 0.1s ease both;
+  }
+  .summary-title {
+    padding: 12px 16px;
+    background: var(--teal-light);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--teal-dark);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 11px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .summary-row:first-of-type { border-top: none; }
+  .summary-label { color: var(--text-muted); flex-shrink: 0; }
+  .summary-value { color: var(--text); font-weight: 500; text-align: right; }
+
+  .success-back-btn {
+    margin: 0 28px 28px;
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+    animation: fadeUp 0.4s 0.2s ease both;
+  }
+  .success-back-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+  .site-header {
+    text-align: center;
+    padding: 36px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .header-logo-wrap svg {
+    width: 56px;
+    height: 56px;
+    display: block;
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .header-title span {
+    color: var(--teal);
+  }
+  .site-header a.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--text-hint);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .site-header a.back-link:hover { color: var(--teal); }
+  .site-header a.back-link svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* Validace - valid/invalid stavy */
+  .input-wrap { position: relative; }
+  .input-wrap input, .input-wrap .phone-input-row { width: 100%; }
+  .valid-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .valid-icon::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 8px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .input-wrap.valid .valid-icon { display: flex; }
+  .input-wrap.valid input {
+    border-color: var(--teal);
+    padding-right: 40px;
+  }
+  .input-wrap.invalid input {
+    border-color: #e05050;
+  }
+  .field-error {
+    font-size: 12px;
+    color: #e05050;
+    display: none;
+    margin-top: -2px;
+  }
+  .input-wrap.invalid + .field-error { display: block; }
+
+  /* Telefon s předvolbou */
+  .phone-input-row {
+    display: flex;
+    height: var(--input-h);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+    transition: border-color 0.15s;
+  }
+  .phone-input-row:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+  }
+  .phone-prefix-wrap {
+    position: relative;
+    flex-shrink: 0;
+    border-right: 1.5px solid var(--border);
+  }
+  .phone-prefix-wrap::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--text-muted);
+    pointer-events: none;
+  }
+  .phone-prefix-wrap select {
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 28px 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    width: auto;
+    min-width: 80px;
+  }
+  .phone-prefix-wrap select:focus { box-shadow: none; }
+  .phone-number-input {
+    flex: 1;
+    height: 100%;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 40px 0 12px !important;
+    font-size: 15px;
+    background: transparent;
+  }
+  .phone-number-input:focus { box-shadow: none !important; }
+  .input-wrap.valid .phone-input-row { border-color: var(--teal); }
+  .input-wrap.invalid .phone-input-row { border-color: #e05050; }
+  .phone-valid-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .phone-valid-icon::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 8px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .input-wrap.valid .phone-valid-icon { display: flex; }
+
+  /* Adresa - našeptávač */
+  .address-group {
+    display: block;
+  }
+  .address-row {
+    margin-bottom: 14px;
+  }
+  .autocomplete-wrap { position: relative; }
+  .autocomplete-wrap input { width: 100%; }
+  .autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1.5px solid var(--teal-mid);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    z-index: 100;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+  }
+  .autocomplete-list.open { display: block; }
+  .autocomplete-item {
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+    transition: background 0.1s;
+  }
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:hover, .autocomplete-item.active { background: var(--teal-light); }
+  .autocomplete-item strong { color: var(--teal-dark); font-weight: 600; }
+  .autocomplete-loading {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-hint);
+    text-align: center;
+  }
+  .autocomplete-attr {
+    font-size: 11px;
+    color: var(--text-hint);
+    text-align: right;
+    padding: 6px 10px 4px;
+    border-top: 1px solid var(--border);
+  }
+  .autocomplete-attr a { color: var(--text-hint); text-decoration: none; }
+
+  @media (max-width: 480px) {
+    body { padding: 0; align-items: flex-start; }
+    .card { border-radius: 0; min-height: 100vh; box-shadow: none; }
+    .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-logo-wrap">
+    <svg width="56" height="56" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_hdr)">
+<rect width="800" height="800" fill="#096A5F"/>
+<path d="M125.165 566.629L130.002 574.243C132.703 578.494 131.797 583.086 127.64 585.731C123.521 588.357 118.76 587.129 116.152 583.029L114.206 579.968L106.649 584.767L103.758 580.214L125.146 566.629H125.165ZM120.29 580.157C121.329 581.801 123.181 582.141 124.73 581.158C126.261 580.195 126.676 578.419 125.637 576.775L123.804 573.903L118.457 577.304L120.29 580.176V580.157Z" fill="white"/>
+<path d="M127.944 607.102L130.041 609.785L142.227 600.225L140.13 597.542L144.003 594.5L151.58 604.155L147.707 607.197L145.553 604.457L133.366 614.018L135.52 616.757L131.647 619.799L124.07 610.144L127.944 607.102Z" fill="white"/>
+<path d="M149.769 629.829L168.833 631.189L169.116 630.906L159.518 620.967L163.032 617.566L176.39 631.397L171.1 636.498L152.112 635.119L151.828 635.402L161.729 645.662L158.214 649.063L144.535 634.892L149.769 629.848V629.829Z" fill="white"/>
+<path d="M177.43 656.906L196.532 656.093L196.778 655.791L186.103 647.005L189.201 643.227L204.033 655.451L199.366 661.119L180.34 661.913L180.095 662.215L191.11 671.284L188.011 675.063L172.82 662.555L177.449 656.944L177.43 656.906Z" fill="white"/>
+<path d="M219.715 690.894L211.345 685.49L207.226 688.872L202.352 685.735L223.305 669.09L229.691 673.209L223.097 699.112L218.317 696.033L219.696 690.894H219.715ZM221.038 685.887L223.721 675.797L223.381 675.589L215.332 682.202L221.057 685.887H221.038Z" fill="white"/>
+<path d="M261.413 710.375L266.382 712.454C265.683 714.116 266.249 715.571 267.95 716.289C269.858 717.083 271.218 716.081 271.88 714.513L276.66 703.044L270.236 700.362L272.182 695.676L283.575 700.437L276.849 716.535C275.13 720.635 271.483 723.28 265.872 720.937C261.923 719.293 259.315 715.288 261.375 710.356L261.413 710.375Z" fill="white"/>
+<path d="M308.573 730.065L299.013 727.25L296.028 731.652L290.473 730.027L305.852 708.129L313.146 710.264L314.166 736.98L308.705 735.374L308.573 730.046V730.065ZM308.441 724.888L308.139 714.458L307.761 714.345L301.904 722.961L308.441 724.888Z" fill="white"/>
+<path d="M336.289 715.965L341.598 716.872L339.954 726.47L342.448 726.904L349.704 718.27L356.165 719.366L346.605 730.116L352.198 744.419L345.66 743.305L341.541 731.911L339.085 731.496L337.309 741.887L332 740.981L336.27 716.003L336.289 715.965Z" fill="white"/>
+<path d="M368.332 733.579C368.747 726.172 374.699 720.806 382.257 721.222C389.89 721.637 395.142 727.702 394.727 735.033C394.311 742.44 388.397 747.881 380.802 747.466C373.168 747.05 367.916 741.061 368.332 733.579ZM389.153 734.731C389.398 730.215 386.3 726.663 381.954 726.437C377.552 726.191 374.132 729.384 373.886 733.9C373.641 738.491 376.664 742.024 381.085 742.27C385.431 742.515 388.888 739.322 389.153 734.731Z" fill="white"/>
+<path d="M436.052 738.468L448.428 723.901L448.371 723.504L434.673 725.356L434.012 720.519L453.057 717.949L454.039 725.223L441.683 739.715L441.739 740.112L455.872 738.204L456.533 743.04L437.016 745.667L436.052 738.449V738.468Z" fill="white"/>
+<path d="M491.523 709.071L500.252 706.161L512.118 723.184L512.458 723.071L506.166 704.177L511.249 702.477L519.26 726.51L510.474 729.438L498.76 712.358L498.382 712.49L504.674 731.385L499.553 733.085L491.542 709.052L491.523 709.071Z" fill="white"/>
+<path d="M527.668 695.81L542.122 689.121L544.257 693.712L534.697 698.134L536.756 702.574L544.994 698.757L547.11 703.329L538.872 707.146L541.102 711.964L550.983 707.392L553.099 711.964L538.324 718.823L527.668 695.829V695.81Z" fill="white"/>
+<path d="M580.497 690.764L571.976 695.922L573.204 701.099L568.254 704.103L562.453 677.972L568.953 674.023L589.358 691.293L584.502 694.24L580.478 690.745L580.497 690.764ZM576.586 687.382L568.688 680.561L568.348 680.769L570.766 690.896L576.586 687.363V687.382Z" fill="white"/>
+<path d="M588.754 660.781L595.896 655.283C599.882 652.222 604.549 652.695 607.553 656.587C610.539 660.46 609.745 665.316 605.91 668.282L603.038 670.493L608.498 677.578L604.228 680.866L588.773 660.781H588.754ZM602.66 664.428C604.209 663.238 604.379 661.367 603.246 659.912C602.15 658.476 600.336 658.212 598.787 659.402L596.085 661.48L599.958 666.506L602.66 664.428Z" fill="white"/>
+<path d="M623.005 649.406C617.828 644.097 617.904 636.086 623.308 630.796C628.768 625.468 636.779 625.694 641.918 630.947C647.095 636.256 647.114 644.305 641.654 649.614C636.193 654.942 628.22 654.772 622.986 649.406H623.005ZM637.932 634.839C634.776 631.608 630.053 631.495 626.954 634.518C623.799 637.598 623.837 642.264 626.992 645.495C630.204 648.783 634.871 648.953 638.026 645.854C641.144 642.812 641.144 638.108 637.932 634.82V634.839Z" fill="white"/>
+<path d="M644.035 609.441L647.435 605.266L663.174 618.095L669.504 610.329L673.396 613.503L663.647 625.463L644.016 609.46L644.035 609.441Z" fill="white"/>
+<path d="M663.438 584.258L672.204 570.957L676.437 573.753L670.636 582.539L674.717 585.222L679.724 577.645L683.919 580.423L678.912 587.999L683.352 590.928L689.341 581.84L693.536 584.617L684.58 598.221L663.438 584.277V584.258Z" fill="white"/>
+<path d="M50.9883 437.903V437.279L60.2275 436.769V368.391L50.9883 367.881V367.258H84.5441V367.881L75.3049 368.391V436.863H96.7118L107.198 412.962H107.821V437.903H50.9883Z" fill="white"/>
+<path d="M145.025 437.9H122.371V437.277L131.1 428.34L149.182 374.719L147.632 370.052V369.429L161.444 364.762L185.345 436.767L192.411 437.277V437.9H160.518V437.277L169.871 436.767L161.765 412.356H137.562L132.158 428.359L145.044 437.296V437.919L145.025 437.9ZM161.331 411.298L149.692 376.287L137.959 411.298H161.331Z" fill="white"/>
+<path d="M205.938 367.258H236.791C257.254 367.258 266.398 374.003 266.398 384.508C266.398 393.445 258.293 399.68 243.234 401.021C261.203 401.437 270.555 406.841 270.555 418.687C270.555 430.534 260.277 437.903 236.791 437.903H205.938V437.279L215.177 436.769V368.391L205.938 367.881V367.258ZM230.254 368.297V400.719H237.831C246.975 400.719 249.98 397.091 249.98 384.508C249.98 371.925 246.956 368.297 237.831 368.297H230.254ZM230.254 401.758V436.882H237.831C249.677 436.882 254.136 432.726 254.136 419.33C254.136 405.934 249.677 401.777 237.831 401.777H230.254V401.758Z" fill="white"/>
+<path d="M288.75 402.57C288.75 381.371 304.338 366.199 322.721 366.199C341.105 366.199 356.598 381.371 356.598 402.57C356.598 423.769 341.011 438.941 322.721 438.941C304.432 438.941 288.75 423.769 288.75 402.57ZM340.18 402.57C340.18 373.681 335.815 367.238 322.721 367.238C309.628 367.238 305.263 373.681 305.263 402.57C305.263 431.459 309.42 437.902 322.721 437.902C336.023 437.902 340.18 431.459 340.18 402.57Z" fill="white"/>
+<path d="M418.326 367.258H442.435V367.881L431.212 376.195V438.942H430.588L384.147 381.277V428.871L397.127 437.279V437.903H374.057V437.279L383.089 429.079V380.03L373.32 367.881V367.258H392.12L430.154 414.531V376.195L418.307 367.881V367.258H418.326Z" fill="white"/>
+<path d="M515.385 437.903H456.152V437.279L465.392 436.769V368.391L456.152 367.881V367.258H514.346V389.591H513.722L502.821 368.297H480.488V401.966H490.766L498.04 388.362H498.664V416.628H498.04L490.766 403.024H480.488V436.901H503.557L514.78 413H515.404V437.94L515.385 437.903Z" fill="white"/>
+<path d="M548.844 437.279L558.083 436.769V368.297H545.613L535.221 390.63H534.598V367.258H596.627V390.63H596.003L585.612 368.297H573.142V436.769L582.381 437.279V437.903H548.825V437.279H548.844Z" fill="white"/>
+<path d="M626.484 437.279L635.724 436.769V368.297H623.253L612.862 390.63H612.238V367.258H674.267V390.63H673.644L663.252 368.297H650.782V436.769L660.021 437.279V437.903H626.465V437.279H626.484Z" fill="white"/>
+<path d="M703.685 437.9H681.031V437.277L689.76 428.34L707.842 374.719L706.274 370.052V369.429L720.085 364.762L743.986 436.767L751.053 437.277V437.9H719.159V437.277L728.512 436.767L720.406 412.356H696.203L690.799 428.359L703.685 437.296V437.919V437.9ZM719.991 411.298L708.352 376.287L696.619 411.298H719.991Z" fill="white"/>
+<path d="M567.401 178.376C585.14 178.376 599.521 163.996 599.521 146.257C599.521 128.517 585.14 114.137 567.401 114.137C549.662 114.137 535.281 128.517 535.281 146.257C535.281 163.996 549.662 178.376 567.401 178.376Z" fill="white"/>
+<path d="M396.091 135.542C418.265 135.542 436.241 117.566 436.241 95.392C436.241 73.2179 418.265 55.2422 396.091 55.2422C373.917 55.2422 355.941 73.2179 355.941 95.392C355.941 117.566 373.917 135.542 396.091 135.542Z" fill="white"/>
+<path d="M210.037 170.364C221.13 170.364 230.122 161.372 230.122 150.28C230.122 139.187 221.13 130.195 210.037 130.195C198.945 130.195 189.953 139.187 189.953 150.28C189.953 161.372 198.945 170.364 210.037 170.364Z" fill="white"/>
+<path d="M255.55 197.136C262.208 197.136 267.605 191.739 267.605 185.082C267.605 178.424 262.208 173.027 255.55 173.027C248.893 173.027 243.496 178.424 243.496 185.082C243.496 191.739 248.893 197.136 255.55 197.136Z" fill="white"/>
+<path d="M193.98 264.058C213.942 264.058 230.125 247.876 230.125 227.914C230.125 207.952 213.942 191.77 193.98 191.77C174.018 191.77 157.836 207.952 157.836 227.914C157.836 247.876 174.018 264.058 193.98 264.058Z" fill="white"/>
+<path d="M650.383 218.539C663.687 218.539 674.473 207.754 674.473 194.449C674.473 181.145 663.687 170.359 650.383 170.359C637.078 170.359 626.293 181.145 626.293 194.449C626.293 207.754 637.078 218.539 650.383 218.539Z" fill="white"/>
+<path d="M282.912 153.133C265.246 153.133 250.887 138.773 250.887 121.107C250.887 103.441 265.246 89.082 282.912 89.082C300.578 89.082 314.938 103.441 314.938 121.107C314.938 138.773 300.578 153.133 282.912 153.133ZM282.912 98.6991C270.555 98.6991 260.485 108.751 260.485 121.126C260.485 133.502 270.537 143.554 282.912 143.554C295.288 143.554 305.339 133.502 305.339 121.126C305.339 108.751 295.288 98.6991 282.912 98.6991Z" fill="white"/>
+<path d="M131.198 214.272C120.07 214.272 111.02 205.221 111.02 194.093C111.02 182.964 120.07 173.914 131.198 173.914C142.327 173.914 151.377 182.964 151.377 194.093C151.377 205.221 142.327 214.272 131.198 214.272ZM131.198 181.604C124.302 181.604 118.709 187.215 118.709 194.093C118.709 200.97 124.321 206.582 131.198 206.582C138.076 206.582 143.687 200.97 143.687 194.093C143.687 187.215 138.076 181.604 131.198 181.604Z" fill="white"/>
+<path d="M104.306 282.295C91.6846 282.295 81.4062 272.017 81.4062 259.396C81.4062 246.774 91.6846 236.496 104.306 236.496C116.927 236.496 127.205 246.774 127.205 259.396C127.205 272.017 116.927 282.295 104.306 282.295ZM104.306 244.186C95.9169 244.186 89.0961 251.007 89.0961 259.396C89.0961 267.785 95.9169 274.605 104.306 274.605C112.695 274.605 119.516 267.785 119.516 259.396C119.516 251.007 112.695 244.186 104.306 244.186Z" fill="white"/>
+<path d="M492.259 121.276C482.642 121.276 474.801 113.453 474.801 103.817C474.801 94.1815 482.623 86.3594 492.259 86.3594C501.895 86.3594 509.717 94.1815 509.717 103.817C509.717 113.453 501.895 121.276 492.259 121.276ZM492.259 94.0492C486.874 94.0492 482.491 98.4327 482.491 103.817C482.491 109.202 486.874 113.586 492.259 113.586C497.644 113.586 502.027 109.202 502.027 103.817C502.027 98.4327 497.644 94.0492 492.259 94.0492Z" fill="white"/>
+<path d="M603.657 240.365C594.04 240.365 586.199 232.543 586.199 222.907C586.199 213.271 594.021 205.449 603.657 205.449C613.293 205.449 621.115 213.271 621.115 222.907C621.115 232.543 613.293 240.365 603.657 240.365ZM603.657 213.139C598.272 213.139 593.889 217.523 593.889 222.907C593.889 228.292 598.272 232.676 603.657 232.676C609.042 232.676 613.425 228.292 613.425 222.907C613.425 217.523 609.042 213.139 603.657 213.139Z" fill="white"/>
+<path d="M692.006 284.047C677.344 284.047 665.422 272.125 665.422 257.463C665.422 242.801 677.344 230.879 692.006 230.879C706.668 230.879 718.59 242.801 718.59 257.463C718.59 272.125 706.668 284.047 692.006 284.047ZM692.006 240.496C682.653 240.496 675.039 248.11 675.039 257.463C675.039 266.815 682.653 274.43 692.006 274.43C701.358 274.43 708.973 266.815 708.973 257.463C708.973 248.11 701.358 240.496 692.006 240.496Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_hdr">
+<rect width="800" height="800" rx="400" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+    <div class="header-title">Labonetta &ndash; <span>pro firmy</span></div>
+  </div>
+  <a href="https://www.labonetta.cz" class="back-link">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Zpět na Labonetta.cz
+  </a>
+</header>
+
+<!-- Netlify Forms detection -->
+<form name="poptavka" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="jmeno"><input name="prijmeni"><input name="telefon">
+  <input name="email"><input name="firma"><input name="adresa"><input name="pocet-osob">
+  <input name="pocet-pizz"><input name="datum"><input name="cas-doruceni">
+  <input name="zpusob-dodani"><input name="gdpr">
+</form>
+
+<div class="card" id="mainCard">
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step active" id="step1">
+      <svg class="step-icon" viewBox="0 0 22 22" fill="none">
+        <rect x="3" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M7 3v4M15 3v4M3 10h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      Poptávka
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step inactive" id="step2">
+      <svg class="step-icon" viewBox="0 0 22 22" fill="none">
+        <rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M16 8l4 2v4H16V8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="6" cy="17" r="2" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="14" cy="17" r="2" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+      Potvrzení
+    </div>
+  </div>
+
+  <!-- Form body -->
+  <div class="form-body" id="formBody">
+
+    <!-- Jméno + Příjmení -->
+    <div class="row">
+      <div class="field">
+        <label for="fname">Jméno</label>
+        <input type="text" id="fname" placeholder="Jan" autocomplete="given-name" required>
+      </div>
+      <div class="field">
+        <label for="lname">Příjmení</label>
+        <input type="text" id="lname" placeholder="Novák" autocomplete="family-name" required>
+      </div>
+    </div>
+
+    <!-- Telefon + Email -->
+    <div class="row">
+      <div class="field">
+        <label for="phone">Telefonní číslo</label>
+        <div class="input-wrap" id="phoneWrap" style="position:relative;">
+          <div class="phone-input-row">
+            <div class="phone-prefix-wrap">
+              <select id="phonePrefix">
+                <option value="+420">+420</option>
+                <option value="+421">+421</option>
+                <option value="+43">+43</option>
+                <option value="+49">+49</option>
+                <option value="+48">+48</option>
+                <option value="+44">+44</option>
+                <option value="+1">+1</option>
+              </select>
+            </div>
+            <input type="tel" id="phone" class="phone-number-input" placeholder="600 000 000" autocomplete="tel" maxlength="12" required>
+          </div>
+          <div class="phone-valid-icon"></div>
+        </div>
+        <span class="field-error" id="phoneError">Zadejte 9 číslic (např. 600 123 456)</span>
+      </div>
+      <div class="field">
+        <label for="email">Mailová adresa</label>
+        <div class="input-wrap" id="emailWrap">
+          <input type="email" id="email" placeholder="jan@firma.cz" autocomplete="email" required>
+          <div class="valid-icon"></div>
+        </div>
+        <span class="field-error" id="emailError">Zadejte platnou emailovou adresu</span>
+      </div>
+    </div>
+
+    <!-- Název firmy -->
+    <div class="row single">
+      <div class="field">
+        <label for="company">Název firmy</label>
+        <input type="text" id="company" placeholder="Firma s.r.o." autocomplete="organization" required>
+      </div>
+    </div>
+
+    <!-- Adresa doručení (animovaně se zobrazí po vyplnění firmy) -->
+    <div class="address-group" id="addressGroup">
+
+      <div class="row single address-row">
+        <div class="field">
+          <label for="address">Adresa doručení</label>
+          <div class="autocomplete-wrap">
+            <div class="input-wrap" id="addressWrap">
+              <input type="text" id="address" placeholder="Začněte psát ulici a číslo…" autocomplete="off">
+              <div class="valid-icon"></div>
+            </div>
+            <div class="autocomplete-list" id="autocompleteList"></div>
+          </div>
+          <input type="hidden" id="addressFull" name="adresa">
+          <span class="field-error" id="addressError">Vyberte adresu ze seznamu</span>
+          <span style="font-size:11px;color:var(--text-hint);margin-top:2px;display:block;" id="addressHint">Pokud se adresa nenašla, zapište ji ručně</span>
+        </div>
+      </div>
+
+      <div class="row address-row">
+        <div class="field">
+          <label for="building">Název budovy <span class="optional">(nepovinné)</span></label>
+          <input type="text" id="building" placeholder="např. Amazon Budova A" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="floor">Patro / místnost <span class="optional">(nepovinné)</span></label>
+          <input type="text" id="floor" placeholder="např. 3. patro, místnost 301" autocomplete="off">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Počet osob + Počet pizz -->
+    <div class="row">
+      <div class="field">
+        <label>Počet osob</label>
+        <div class="counter-wrap" id="personsCounter">
+          <button class="counter-btn" type="button" onclick="changeCounter('persons', -1)">−</button>
+          <div class="counter-divider"></div>
+          <input class="counter-value" id="personsVal" type="number" value="10" min="1" max="999">
+          <div class="counter-divider"></div>
+          <button class="counter-btn" type="button" onclick="changeCounter('persons', 1)">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Počet pizz</label>
+        <div class="counter-wrap" id="pizzasCounter">
+          <button class="counter-btn" type="button" onclick="changeCounter('pizzas', -1)">−</button>
+          <div class="counter-divider"></div>
+          <input class="counter-value" id="pizzasVal" type="number" value="10" min="1" max="999">
+          <div class="counter-divider"></div>
+          <button class="counter-btn" type="button" onclick="changeCounter('pizzas', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datum + Čas -->
+    <div class="row">
+      <div class="field">
+        <label for="datum">Datum</label>
+        <input type="date" id="datum" required>
+      </div>
+      <div class="field">
+        <label for="cas">Čas doručení</label>
+        <div class="select-wrap">
+          <select id="cas" required>
+            <option value="">— vyberte —</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Způsob dodání -->
+    <div class="row single" style="margin-bottom: 14px;">
+      <div class="field">
+        <label style="margin-bottom: 4px;">Způsob dodání</label>
+        <div class="delivery-group">
+          <label class="delivery-option selected" id="opt1" onclick="selectDelivery('zasedacka', this)">
+            <input type="radio" name="delivery" value="zasedacka" checked>
+            <div class="delivery-radio"></div>
+            Dovézt přímo do zasedačky (uvnitř firmy)
+          </label>
+          <label class="delivery-option" id="opt2" onclick="selectDelivery('dvere', this)">
+            <input type="radio" name="delivery" value="dvere">
+            <div class="delivery-radio"></div>
+            Doručit k prvním dveřím / recepci
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poznámka -->
+    <div class="row single" style="margin-bottom: 14px;">
+      <div class="field">
+        <label for="poznamka">Poznámka k objednávce <span class="optional">(nepovinné)</span></label>
+        <textarea id="poznamka" placeholder="Alergie, vegetariáni, speciální přání k objednávce…" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- Opakovaná objednávka -->
+    <div class="repeat-wrap" id="repeatWrap" onclick="toggleRepeat()" style="margin-bottom: 14px;">
+      <div class="repeat-checkbox" id="repeatBox"></div>
+      <div>
+        <div class="repeat-text">Mám zájem o pravidelné dodávky</div>
+        <div class="repeat-sub">Náš tým Vás kontaktuje s nabídkou pravidelného cateringu</div>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div class="info-box">
+      <svg class="info-icon" viewBox="0 0 22 22" fill="none">
+        <circle cx="11" cy="11" r="9" stroke="#1D9E75" stroke-width="1.6"/>
+        <path d="M11 10v5" stroke="#1D9E75" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="11" cy="7.5" r="0.8" fill="#1D9E75"/>
+      </svg>
+      <p>Vaši poptávku co nejdříve zpracujeme a ozveme se vám s potvrzením.</p>
+    </div>
+
+    <!-- GDPR -->
+    <div class="gdpr-wrap" onclick="toggleGdpr()" id="gdprWrap">
+      <div class="gdpr-checkbox" id="gdprBox"></div>
+      <span class="gdpr-text">
+        Souhlasím se zpracováním osobních údajů dle
+        <a href="#" onclick="event.stopPropagation()">zásad ochrany osobních údajů</a>.
+      </span>
+    </div>
+
+  </div><!-- /form-body -->
+
+  <!-- Footer -->
+  <div class="form-footer">
+    <button class="btn-submit" id="submitBtn" onclick="handleSubmit()" disabled>Odeslat poptávku</button>
+  </div>
+
+  <!-- Success screen / Potvrzení -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-hero">
+      <div class="success-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M7 16l7 7 11-13" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Poptávka odeslána!</h2>
+      <p>Děkujeme, ozveme se Vám co nejdříve<br>na zadaný email nebo telefon.</p>
+    </div>
+
+    <div class="summary-block">
+      <div class="summary-title">Shrnutí poptávky</div>
+      <div class="summary-row"><span class="summary-label">Kontakt</span><span class="summary-value" id="s-name"></span></div>
+      <div class="summary-row"><span class="summary-label">Firma</span><span class="summary-value" id="s-company"></span></div>
+      <div class="summary-row" id="s-addr-row"><span class="summary-label">Adresa</span><span class="summary-value" id="s-addr"></span></div>
+      <div class="summary-row" id="s-building-row"><span class="summary-label">Budova / patro</span><span class="summary-value" id="s-building"></span></div>
+      <div class="summary-row"><span class="summary-label">Datum a čas</span><span class="summary-value" id="s-datetime"></span></div>
+      <div class="summary-row"><span class="summary-label">Počet osob / pizz</span><span class="summary-value" id="s-counts"></span></div>
+      <div class="summary-row"><span class="summary-label">Způsob dodání</span><span class="summary-value" id="s-delivery"></span></div>
+      <div class="summary-row" id="s-note-row"><span class="summary-label">Poznámka</span><span class="summary-value" id="s-note"></span></div>
+      <div class="summary-row" id="s-repeat-row"><span class="summary-label">Pravidelné dodávky</span><span class="summary-value" id="s-repeat"></span></div>
+      <div class="summary-row"><span class="summary-label">Email</span><span class="summary-value" id="s-email"></span></div>
+      <div class="summary-row"><span class="summary-label">Telefon</span><span class="summary-value" id="s-phone"></span></div>
+    </div>
+
+    <a href="https://www.labonetta.cz" class="success-back-btn">← Zpět na Labonetta.cz</a>
+  </div>
+
+  <div class="powered">Labonetta – Poptávkový formulář</div>
+
+</div>
+
+<script>
+  const counters = { persons: 10, pizzas: 10 };
+
+  function clearAddress() {
+    document.getElementById('address').value = '';
+    document.getElementById('addressFull').value = '';
+    document.getElementById('addressWrap').classList.remove('valid', 'invalid');
+    document.getElementById('autocompleteList').classList.remove('open');
+  }
+
+  // Nominatim autocomplete — Praha
+  let abortCtrl = null;
+  let debounceTimer = null;
+  let selectedFromList = false;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('address');
+    const list = document.getElementById('autocompleteList');
+
+    input.addEventListener('input', () => {
+      selectedFromList = false;
+      document.getElementById('addressWrap').classList.remove('valid');
+      clearTimeout(debounceTimer);
+      const q = input.value.trim();
+      if (q.length < 3) { list.classList.remove('open'); return; }
+      debounceTimer = setTimeout(() => fetchSuggestions(q), 350);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = list.querySelectorAll('.autocomplete-item');
+      const active = list.querySelector('.autocomplete-item.active');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!active) items[0]?.classList.add('active');
+        else { active.classList.remove('active'); (active.nextElementSibling || items[0])?.classList.add('active'); }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!active) items[items.length-1]?.classList.add('active');
+        else { active.classList.remove('active'); (active.previousElementSibling || items[items.length-1])?.classList.add('active'); }
+      } else if (e.key === 'Enter' && active) {
+        e.preventDefault();
+        active.click();
+      } else if (e.key === 'Escape') {
+        list.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.autocomplete-wrap')) {
+        list.classList.remove('open');
+        // Pokud uživatel napsal adresu ručně bez výběru, vezmeme co napsal
+        if (input.value.trim() && !document.getElementById('addressFull').value) {
+          document.getElementById('addressFull').value = input.value.trim();
+          document.getElementById('addressWrap').classList.add('valid');
+        }
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (input.value.trim() && !document.getElementById('addressFull').value) {
+          document.getElementById('addressFull').value = input.value.trim();
+          document.getElementById('addressWrap').classList.add('valid');
+        }
+      }, 200);
+    });
+  });
+
+  async function fetchSuggestions(q) {
+    const list = document.getElementById('autocompleteList');
+    list.innerHTML = '<div class="autocomplete-loading">Hledám adresy…</div>';
+    list.classList.add('open');
+
+    if (abortCtrl) abortCtrl.abort();
+    abortCtrl = new AbortController();
+
+    try {
+      const url = `https://api.mapy.com/v1/suggest?apikey=b0PBAwedZAVJMYlpzijxERQAEoROIv6yniTvoj0OjBs&lang=cs&limit=6&type=regional.address&locality=Praha&query=${encodeURIComponent(q)}`;
+
+      const res = await fetch(url, { signal: abortCtrl.signal });
+      if (!res.ok) throw new Error('API error: ' + res.status);
+      const data = await res.json();
+      const items = data.items || [];
+
+      if (!items.length) {
+        list.innerHTML = '<div class="autocomplete-loading">Adresa nenalezena, zkuste jiný výraz</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      items.forEach(item => {
+        const label = item.name || '';
+        const sublabel = item.location || '';
+        const fullAddress = [label, sublabel].filter(Boolean).join(', ');
+
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.innerHTML = `<strong>${label}</strong><br><span style="font-size:12px;color:var(--text-muted)">${sublabel}</span>`;
+        div.addEventListener('click', () => {
+          document.getElementById('address').value = label;
+          document.getElementById('addressFull').value = fullAddress;
+          document.getElementById('addressWrap').classList.add('valid');
+          document.getElementById('addressWrap').classList.remove('invalid');
+          selectedFromList = true;
+          list.classList.remove('open');
+        });
+        list.appendChild(div);
+      });
+
+      const attr = document.createElement('div');
+      attr.className = 'autocomplete-attr';
+      attr.innerHTML = '© <a href="https://mapy.cz" target="_blank">Mapy.cz</a>';
+      list.appendChild(attr);
+
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        list.innerHTML = '<div class="autocomplete-loading">Chyba načítání, zkuste znovu</div>';
+      }
+    }
+  }
+
+  function changeCounter(type, delta) {
+    const input = document.getElementById(type + 'Val');
+    const current = parseInt(input.value) || 1;
+    const newVal = Math.max(1, current + delta);
+    input.value = newVal;
+    counters[type] = newVal;
+  }
+
+  // Sync při ručním psaní
+  document.addEventListener('DOMContentLoaded', () => {
+    ['persons', 'pizzas'].forEach(type => {
+      document.getElementById(type + 'Val').addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        counters[type] = isNaN(val) || val < 1 ? 1 : val;
+      });
+      document.getElementById(type + 'Val').addEventListener('blur', (e) => {
+        if (!e.target.value || parseInt(e.target.value) < 1) {
+          e.target.value = 1;
+          counters[type] = 1;
+        }
+      });
+    });
+  });
+
+  function selectDelivery(val, el) {
+    document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  let repeatChecked = false;
+  function toggleRepeat() {
+    repeatChecked = !repeatChecked;
+    document.getElementById('repeatBox').parentElement.classList.toggle('checked', repeatChecked);
+  }
+
+  let gdprChecked = false;
+  function toggleGdpr() {
+    gdprChecked = !gdprChecked;
+    document.getElementById('gdprBox').classList.toggle('checked', gdprChecked);
+    document.getElementById('submitBtn').disabled = !gdprChecked;
+  }
+
+  // Populate time select 09:00–21:00 in 30min steps
+  const sel = document.getElementById('cas');
+  for (let h = 11; h <= 21; h++) {
+    ['00','30'].forEach(m => {
+      if (h === 21 && m === '30') return;
+      const v = `${String(h).padStart(2,'0')}:${m}`;
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      sel.appendChild(opt);
+    });
+  }
+
+  // Set min date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('datum').setAttribute('min', today);
+  document.getElementById('datum').value = today;
+
+  // Validace telefonu — 9 číslic
+  function validatePhone() {
+    const val = document.getElementById('phone').value.replace(/\s/g, '');
+    const wrap = document.getElementById('phoneWrap');
+    const ok = /^\d{9}$/.test(val);
+    wrap.classList.toggle('valid', ok);
+    wrap.classList.toggle('invalid', val.length > 0 && !ok);
+    return ok;
+  }
+
+  // Validace emailu
+  function validateEmail() {
+    const val = document.getElementById('email').value.trim();
+    const wrap = document.getElementById('emailWrap');
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    wrap.classList.toggle('valid', ok);
+    wrap.classList.toggle('invalid', val.length > 0 && !ok);
+    return ok;
+  }
+
+  document.getElementById('phone').addEventListener('input', validatePhone);
+  document.getElementById('email').addEventListener('input', validateEmail);
+
+  function handleSubmit() {
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const company = document.getElementById('company').value.trim();
+    const datum = document.getElementById('datum').value;
+    const cas = document.getElementById('cas').value;
+
+    const addressFull = document.getElementById('addressFull').value.trim();
+    const addressVisible = true;
+
+    if (!fname || !lname || !phone || !email || !company || !datum || !cas) {
+      alert('Prosím vyplňte všechna povinná pole.');
+      return;
+    }
+    if (addressVisible && !addressFull) {
+      document.getElementById('addressWrap').classList.add('invalid');
+      alert('Prosím vyberte adresu doručení ze seznamu.');
+      document.getElementById('address').focus();
+      return;
+    }
+    if (!validatePhone()) {
+      alert('Telefonní číslo musí obsahovat 9 číslic.');
+      document.getElementById('phone').focus();
+      return;
+    }
+    if (!validateEmail()) {
+      alert('Zadejte platnou emailovou adresu.');
+      document.getElementById('email').focus();
+      return;
+    }
+    if (!gdprChecked) {
+      alert('Prosím potvrďte souhlas se zpracováním osobních údajů.');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Odesílám…';
+
+    const delivery = document.querySelector('[name=delivery]:checked').value;
+    const deliveryLabel = delivery === 'zasedacka' ? 'Dovézt do zasedačky' : 'K prvním dveřím / recepci';
+
+    const prefix = document.getElementById('phonePrefix').value;
+    const building = document.getElementById('building').value.trim();
+    const floor = document.getElementById('floor').value.trim();
+    const poznamka = document.getElementById('poznamka').value.trim();
+
+    const templateParams = {
+      jmeno: fname,
+      prijmeni: lname,
+      telefon: prefix + ' ' + phone,
+      email: email,
+      firma: company,
+      adresa: addressFull || '—',
+      budova: building || '—',
+      patro: floor || '—',
+      datum: datum,
+      cas: cas,
+      osoby: parseInt(document.getElementById('personsVal').value) || counters.persons,
+      pizzy: parseInt(document.getElementById('pizzasVal').value) || counters.pizzas,
+      dodani: deliveryLabel,
+      poznamka: poznamka || '—',
+      opakovani: repeatChecked ? 'Ano, má zájem' : 'Ne',
+    };
+
+    fetch('/.netlify/functions/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(templateParams)
+    }).then(r => r.json())
+      .then(() => {
+        // Přepneme stepper
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step1').classList.add('inactive');
+        document.getElementById('step2').classList.remove('inactive');
+        document.getElementById('step2').classList.add('active');
+
+        // Naplníme shrnutí
+        document.getElementById('s-name').textContent = fname + ' ' + lname;
+        document.getElementById('s-company').textContent = company;
+        document.getElementById('s-email').textContent = email;
+        document.getElementById('s-phone').textContent = prefix + ' ' + phone;
+        document.getElementById('s-counts').textContent = counters.persons + ' osob / ' + counters.pizzas + ' pizz';
+        document.getElementById('s-delivery').textContent = deliveryLabel;
+        const poznamkaVal = document.getElementById('poznamka').value.trim();
+        if (poznamkaVal) {
+          document.getElementById('s-note').textContent = poznamkaVal;
+        } else {
+          document.getElementById('s-note-row').style.display = 'none';
+        }
+        if (repeatChecked) {
+          document.getElementById('s-repeat').textContent = 'Ano, má zájem o pravidelné dodávky';
+          document.getElementById('s-repeat').style.color = 'var(--teal-dark)';
+        } else {
+          document.getElementById('s-repeat-row').style.display = 'none';
+        }
+
+        // Datum čitelně
+        const d = new Date(datum);
+        const datumCz = d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('s-datetime').textContent = datumCz + ' v ' + cas;
+
+        // Adresa - skryjeme řádek pokud není
+        if (addressFull) {
+          document.getElementById('s-addr').textContent = addressFull;
+          const bld = [building, floor].filter(Boolean).join(', ');
+          if (bld) {
+            document.getElementById('s-building').textContent = bld;
+          } else {
+            document.getElementById('s-building-row').style.display = 'none';
+          }
+        } else {
+          document.getElementById('s-addr-row').style.display = 'none';
+          document.getElementById('s-building-row').style.display = 'none';
+        }
+
+        // Zobrazíme success screen
+        document.getElementById('formBody').style.display = 'none';
+        document.querySelector('.form-footer').style.display = 'none';
+        document.getElementById('successScreen').classList.add('visible');
+      }, () => {
+        btn.disabled = false;
+        btn.textContent = 'Odeslat poptávku';
+        alert('Nepodařilo se odeslat formulář. Zkuste to prosím znovu.');
+      });
+  }
+</script>
+</body>
+</html>
