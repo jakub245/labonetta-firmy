@@ -1,24 +1,17 @@
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   const RESEND_API_KEY = 're_Q84rPpcU_Q54brUqN1P6CXjufHM3yi4xd';
   const FROM = 'Labonetta pro firmy <noreply@labonetta.cz>';
   const NOTIFY_TO = 'prosek@labonetta.cz';
 
-  let data;
-  try {
-    data = JSON.parse(event.body);
-  } catch {
-    return { statusCode: 400, body: 'Invalid JSON' };
-  }
-
   const {
     jmeno, prijmeni, telefon, email, firma,
     adresa, budova, patro, datum, cas,
     osoby, pizzy, dodani, poznamka, opakovani
-  } = data;
+  } = req.body;
 
   // Email tobě — notifikace
   const notifikaceHtml = `
@@ -98,14 +91,8 @@ exports.handler = async (event) => {
       })
     ]);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true })
-    };
+    return res.status(200).json({ success: true });
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    return res.status(500).json({ error: err.message });
   }
 };
